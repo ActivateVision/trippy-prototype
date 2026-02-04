@@ -1,0 +1,4343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trippy Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sage: #6f7833;
+            --gold: #c6911c;
+            --orange: #cc5e33;
+            --teal: #139e93;
+            --blue: #4c7b87;
+            --choc: #3e2d26;
+            --yellow: #deb510;
+            --eggplant: #4d294d;
+            --olive: #494d2a;
+            --mauve: #ac7169;
+            --light-gray: #DCDCDD;
+            --cloud-dancer: #f5f5f0;
+            --bg: #ffffff;
+            --bg-tray: #f5f5f6;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #7a7a7a;
+            --text-light: #9a9a9a;
+            --border: #e8e8e8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans', -apple-system, sans-serif;
+            background: var(--bg-tray);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .phone-frame {
+            width: 430px;
+            height: 932px;
+            background: #ffffff;
+            border-radius: 50px;
+            border: 8px solid #1c1c1e;
+            margin: 40px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.15);
+        }
+
+        .notch {
+            width: 160px;
+            height: 34px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
+        /* ================================ */
+        /* FEED VIEW */
+        /* ================================ */
+        .feed-view {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .feed-header {
+            padding: 50px 20px 12px;
+            background: #ffffff;
+        }
+
+        .logo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-group { display: flex; align-items: center; gap: 10px; }
+
+        .logo-image {
+            width: 110px;
+            height: auto;
+        }
+
+        .logo-text { 
+            font-size: 26px; 
+            font-weight: 600; 
+            color: var(--text-primary);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .profile-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23e8d4c4"/><circle cx="50" cy="40" r="20" fill="%23c9a88a"/><path d="M20 85 Q50 60 80 85" fill="%23d4b896"/></svg>') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            overflow: hidden;
+        }
+
+        .profile-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .feed-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            margin-top: 22px;
+        }
+
+        .feed-tabs::-webkit-scrollbar { display: none; }
+
+        .feed-tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid #F1F0EC;
+            background: transparent;
+            color: var(--choc);
+            transition: background 0.2s;
+        }
+        
+        .feed-tab:hover {
+            background: var(--cloud-dancer);
+        }
+
+        .feed-tab.active {
+            background: var(--cloud-dancer);
+            color: var(--choc);
+            border-color: #F1F0EC;
+        }
+
+        .feed-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            padding-bottom: 100px;
+            background: #ffffff;
+        }
+
+        .feed-scroll::-webkit-scrollbar { display: none; }
+
+        /* Active Filter State */
+        .filter-back-bar {
+            display: none;
+            align-items: center;
+            padding: 0 0 16px 0;
+            margin-bottom: 0;
+        }
+
+        .filter-back-bar.visible {
+            display: flex;
+        }
+
+        .filter-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-back-btn:hover {
+            background: var(--bg-tray);
+        }
+
+        .filter-back-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* Active filter chips display - single line with back arrow */
+        .active-filters-bar {
+            display: none;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 16px 0;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        
+        .active-filters-bar.visible {
+            display: flex;
+        }
+        
+        .filter-back-arrow {
+            width: 24px;
+            height: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .filter-back-arrow:hover {
+            color: var(--text-primary);
+        }
+        
+        .active-filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .active-filter-chip.subject {
+            background: var(--orange);
+        }
+        
+        .active-filter-chip.verb {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .active-filter-chip.object {
+            background: var(--teal);
+        }
+        
+        .active-filter-chip .remove-filter {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        
+        .active-filter-chip .remove-filter:hover {
+            opacity: 1;
+        }
+        
+        .filter-arrow {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .save-filters-btn {
+            margin-left: auto;
+            padding: 8px 16px;
+            background: var(--gold);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .save-filters-btn:hover {
+            background: #b8820f;
+        }
+        
+        /* Filtered results section */
+        .filtered-results {
+            display: none;
+        }
+        
+        .filtered-results.visible {
+            display: block;
+        }
+        
+        .filtered-results-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        /* Related Media Cards */
+        .related-media-section {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .related-media-section.visible {
+            display: block;
+        }
+
+        .related-media-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .related-media-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .related-media-count {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .related-media-card {
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .related-media-card:hover {
+            border-color: var(--gold);
+            background: rgba(198,145,28,0.03);
+        }
+
+        .related-media-thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .related-media-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .related-media-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .related-media-type svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .related-media-headline {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .related-media-source {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .related-media-connection {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: rgba(19,158,147,0.1);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--teal);
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        /* Context Summary */
+        .context-summary {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .context-summary-text {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin: 0 0 16px 0;
+        }
+
+        .start-trippy-card-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: var(--gold);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .start-trippy-card-btn:hover {
+            background: #b8820f;
+            transform: scale(1.02);
+        }
+
+        .start-trippy-card-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Clickable Object Pill */
+        .svo-pill.object.clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .svo-pill.object.clickable:hover {
+            background: #0f7b72;
+            transform: scale(1.02);
+        }
+
+        .svo-pill.object.active {
+            box-shadow: 0 0 0 3px rgba(19,158,147,0.3);
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 84px;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px 20px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 12px 14px;
+            font-family: inherit;
+            border-radius: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-item svg {
+            width: 26px;
+            height: 26px;
+            color: #999;
+            fill: #999;
+        }
+
+        .nav-item.active svg {
+            color: var(--orange);
+            fill: var(--orange);
+        }
+        
+        /* Stacks icon - diagonal lines */
+        .nav-stacks-icon {
+            width: 26px;
+            height: 26px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .nav-stacks-icon span {
+            width: 18px;
+            height: 3px;
+            background: #999;
+            border-radius: 2px;
+            transform: rotate(-45deg);
+        }
+        
+        .nav-item.active .nav-stacks-icon span {
+            background: var(--orange);
+        }
+
+        /* ================================ */
+        /* STACKS VIEW */
+        /* ================================ */
+        .stacks-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 210;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stacks-view.visible {
+            transform: translateX(0);
+        }
+
+        .stacks-header {
+            padding: 50px 20px 16px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stacks-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stacks-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stacks-count {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .stacks-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .stacks-scroll::-webkit-scrollbar { display: none; }
+
+        .stack-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stack-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .stack-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .stack-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stack-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .stack-info { flex: 1; }
+
+        .stack-name {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .stack-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .stack-arrow {
+            color: var(--text-light);
+        }
+
+        .stack-arrow svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .stack-preview {
+            display: flex;
+            gap: 8px;
+        }
+
+        .stack-preview-thumb {
+            width: 60px;
+            height: 45px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .stack-preview-more {
+            width: 60px;
+            height: 45px;
+            border-radius: 8px;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Stack Detail View */
+        .stack-detail-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 220;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stack-detail-view.visible {
+            transform: translateX(0);
+        }
+
+        .stack-detail-header {
+            padding: 50px 20px 16px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stack-detail-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+
+        .stack-detail-back svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .stack-detail-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stack-detail-icon {
+            font-size: 28px;
+        }
+
+        .stack-detail-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stack-detail-count {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stack-cards-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            padding-bottom: 100px;
+        }
+
+        .stack-cards-scroll::-webkit-scrollbar { display: none; }
+
+        /* Saved Card Item */
+        .saved-card-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .saved-card-item:hover {
+            border-color: var(--gold);
+        }
+
+        .saved-card-thumb {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .saved-card-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .saved-card-svo {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.35;
+            margin-bottom: 6px;
+        }
+
+        .saved-card-svo .subject { color: var(--orange); }
+        .saved-card-svo .object { color: var(--teal); }
+
+        .saved-card-status {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: pulse 1s infinite;
+        }
+
+        .status-dot.steady {
+            background: var(--sage);
+            animation: none;
+        }
+
+        .status-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .saved-card-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .saved-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .saved-card-meta svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .update-badge {
+            background: var(--gold);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Notification badge */
+        .nav-notif {
+            position: relative;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            background: #e53935;
+            border-radius: 9px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+
+        /* Event Card */
+        .event-card {
+            background: var(--bg);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .card-hero {
+            height: 168px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+        }
+
+        .card-hero:hover { transform: scale(1.01); }
+
+        .svo-container { 
+            position: relative; 
+            z-index: 2; 
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .svo-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .svo-row-bottom {
+            display: flex;
+        }
+
+        /* Single line SVO - when content fits */
+        .svo-container.single-line {
+            flex-wrap: nowrap;
+        }
+        
+        .svo-container.single-line .svo-row-bottom {
+            display: none;
+        }
+
+        .svo-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .svo-pill.subject { 
+            background: var(--orange); 
+            color: #fff; 
+        }
+        .svo-pill.verb { 
+            background: rgba(255, 255, 255, 0.9); 
+            color: var(--text-primary); 
+        }
+        .svo-pill.object {
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .svo-arrow { color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 600; }
+
+        /* Clickable S and O pills */
+        .svo-pill.clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .svo-pill.clickable:hover {
+            transform: scale(1.03);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .svo-pill.subject.clickable:hover {
+            background: rgba(255, 128, 80, 0.95);
+        }
+
+        .svo-pill.object.clickable:hover {
+            background: rgba(20, 184, 166, 0.95);
+        }
+
+        .svo-pill.active {
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+        }
+
+        /* Card Meta - Single Line */
+        .card-meta-line {
+            padding: 9px 16px 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .meta-item svg { width: 14px; height: 14px; color: var(--gold); }
+
+        .meta-bookmark {
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-bookmark svg { color: var(--gold); }
+        
+        .meta-date {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-left: auto;
+        }
+
+        /* Sensemaker Quote - 3 lines max */
+        .card-sensemaker {
+            padding: 12px 16px;
+        }
+
+        .sensemaker-quote-text {
+            font-size: 13px;
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .sensemaker-attribution {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .sensemaker-attribution a {
+            color: var(--orange);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sensemaker-attribution a:hover { text-decoration: underline; }
+
+        /* Start Trippy Card CTA */
+        .start-card-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--orange);
+            transition: all 0.2s;
+        }
+
+        .start-card-cta:hover {
+            background: rgba(204, 94, 51, 0.05);
+        }
+
+        .start-card-cta svg {
+            color: var(--orange);
+        }
+
+        /* ================================ */
+        /* DETAIL VIEW (Trippy Card) */
+        /* ================================ */
+        .detail-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 200;
+            transform: translateX(100%);
+            transition: transform 0.35s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-view.visible { 
+            transform: translateX(0); 
+        }
+        
+        .detail-scroll {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .detail-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            padding: 50px 20px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .back-btn svg { width: 22px; height: 22px; color: var(--text-secondary); }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-action-btn svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* Hero with tabs overlay */
+        .detail-hero-wrapper {
+            position: relative;
+            height: 280px;
+            margin-top: 80px;
+        }
+
+        .detail-hero-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* SVO Pills on hero - centered vertically, left side */
+        .detail-hero-svo {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            z-index: 5;
+        }
+
+        .hero-svo-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hero-svo-row-bottom {
+            display: flex;
+        }
+
+        .hero-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero-pill.subject {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        .hero-pill.verb {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+        }
+
+        .hero-pill.object {
+            background: var(--teal);
+            color: #fff;
+        }
+
+        .hero-arrow {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .detail-hero-tabs {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            padding-bottom: 50px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+            overflow-x: scroll;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .detail-hero-tabs::-webkit-scrollbar { display: none; }
+
+        .detail-hero-tab {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-hero-tab.active {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Content card that overlaps hero */
+        .detail-content-card {
+            background: var(--cloud-dancer);
+            border-radius: 40px 40px 0 0;
+            margin-top: -30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .detail-tab-content {
+            padding: 28px 24px 20px;
+            background: var(--cloud-dancer);
+            border-radius: 40px 40px 0 0;
+        }
+        
+        .content-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding-top: 16px;
+        }
+        
+        .pagination-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #777;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .pagination-dot.active {
+            background: var(--orange);
+        }
+        
+        .pagination-dot:hover {
+            background: #999;
+        }
+        
+        .pagination-dot.active:hover {
+            background: var(--orange);
+        }
+
+        .tab-time-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--orange);
+            margin-bottom: 12px;
+        }
+
+        .tab-headline {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .tab-headline span {
+            font-weight: 400;
+        }
+
+        .tab-body {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tab-body p {
+            margin-bottom: 12px;
+        }
+
+        .tab-body a {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .tab-attribution {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        .tab-attribution strong {
+            color: var(--text-primary);
+        }
+
+        .tab-attribution a {
+            color: var(--orange);
+            text-decoration: none;
+        }
+
+        .detail-scroll-rest {
+            background: #ffffff;
+            padding-bottom: 100px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* EXACT LAYOUT FROM PHOTOSHOP */
+        .detail-top {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Row 1: Badges */
+        .status-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .velocity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--choc);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .velocity-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .epistemic-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 14px;
+            background: var(--bg-tray);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        /* Option 3: Large hero with SVO, Why It Matters below */
+        .detail-hero-large {
+            width: 100%;
+            height: 126px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .detail-hero-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .why-matters-full {
+            background: var(--bg-tray);
+            border-left: 4px solid var(--gold);
+            padding: 14px 16px;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .why-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .why-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Event Summary Block */
+        .event-summary-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .summary-header:hover {
+            background: var(--bg-tray);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .summary-toggle svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+        }
+
+        .event-summary-block.expanded .summary-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        .event-summary-block.expanded .summary-toggle span {
+            display: none;
+        }
+
+        .summary-preview {
+            padding: 0 16px 14px;
+        }
+
+        .summary-preview p {
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--text-secondary);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .event-summary-block.expanded .summary-preview {
+            display: none;
+        }
+
+        .summary-expanded {
+            display: none;
+            padding: 0 16px 16px;
+        }
+
+        .event-summary-block.expanded .summary-expanded {
+            display: block;
+        }
+
+        .summary-expanded p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin: 0 0 12px 0;
+        }
+
+        .summary-expanded p:last-of-type {
+            margin-bottom: 16px;
+        }
+
+        .summary-sources {
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            margin-top: 8px;
+        }
+
+        .sources-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .source-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .source-chip {
+            padding: 5px 12px;
+            background: var(--bg-tray);
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .contributors-list {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .contributors-label {
+            color: var(--text-light);
+        }
+
+        .contributor-names {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Context Tabs Section */
+        .context-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .context-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+            margin-bottom: 14px;
+        }
+
+        .context-tabs::-webkit-scrollbar { display: none; }
+
+        .context-tab {
+            flex-shrink: 0;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-align: center;
+            border-radius: 20px;
+            cursor: pointer;
+            background: var(--bg-tray);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .context-tab:hover {
+            border-color: var(--gold);
+        }
+
+        .context-tab.active {
+            background: var(--choc);
+            color: #fff;
+            border-color: var(--choc);
+        }
+
+        .context-panel { display: none; }
+        .context-panel.active { display: block; }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .timeline-item:last-child { border-bottom: none; }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .timeline-dot.major { background: var(--gold); }
+
+        .timeline-date { font-size: 11px; color: var(--text-light); margin-bottom: 3px; }
+        .timeline-text { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
+
+        .result-item {
+            padding: 12px;
+            background: var(--bg-tray);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .result-type {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .result-type.short-term { color: var(--gold); }
+        .result-type.long-term { color: var(--blue); }
+
+        .result-text { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
+
+        /* Opposite Sides Panel */
+        .side-item {
+            padding: 14px;
+            background: var(--bg-tray);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .side-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .side-label.bullish {
+            background: rgba(19, 158, 147, 0.15);
+            color: var(--teal);
+        }
+
+        .side-label.bearish {
+            background: rgba(204, 94, 51, 0.15);
+            color: var(--orange);
+        }
+
+        .side-text {
+            font-size: 14px;
+            font-style: italic;
+            color: var(--text-primary);
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .side-source {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Key Themes Panel */
+        .theme-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-tray);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .theme-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .theme-content {
+            flex: 1;
+        }
+
+        .theme-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .theme-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Stories Panel */
+        .story-card {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tray);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .story-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .story-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .story-type {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 4px;
+        }
+
+        .story-headline {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .story-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px 12px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-count { font-size: 12px; color: var(--text-light); }
+
+        /* Sensemaker Cards */
+        .sensemaker-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 0 20px 16px;
+            scrollbar-width: none;
+        }
+
+        .sensemaker-scroll::-webkit-scrollbar { display: none; }
+
+        .sensemaker-card {
+            flex-shrink: 0;
+            width: 260px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .sensemaker-card:hover { border-color: var(--eggplant); }
+
+        .sensemaker-card.featured {
+            border-color: var(--eggplant);
+            background: linear-gradient(135deg, rgba(77,41,77,0.04) 0%, transparent 100%);
+        }
+
+        .featured-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--eggplant);
+            text-transform: uppercase;
+            padding: 3px 8px;
+            background: rgba(77,41,77,0.1);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .sensemaker-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sensemaker-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .sensemaker-avatar.verified {
+            background: rgba(77,41,77,0.1);
+            color: var(--eggplant);
+        }
+
+        .sensemaker-info { flex: 1; }
+        .sensemaker-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .sensemaker-role { font-size: 11px; color: var(--text-muted); }
+
+        .sensemaker-stance {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stance-cautious { background: var(--bg-tray); color: var(--text-secondary); }
+        .stance-critical { background: rgba(204,94,51,0.1); color: var(--orange); }
+        .stance-bullish { background: rgba(19,158,147,0.1); color: var(--teal); }
+
+        .sensemaker-take {
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .sensemaker-take::before {
+            content: '"';
+            color: var(--gold);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Conversation Section */
+        .conversation-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            background: var(--cloud-dancer);
+        }
+
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .conversation-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .conversation-hint svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .comment-count { font-size: 12px; color: var(--text-light); }
+
+        .comment-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            pointer-events: none;
+        }
+
+        .comment-input:focus { border-color: var(--gold); }
+        .comment-input::placeholder { color: var(--text-light); }
+
+        /* Conversation Mode Panel */
+        .conversation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 240;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .conversation-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .conversation-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 250;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conversation-panel.visible {
+            transform: translateY(0);
+        }
+
+        .convo-header {
+            padding: 50px 20px 12px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .convo-card-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .convo-card-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .convo-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .convo-card-title .subject { color: var(--orange); }
+        .convo-card-title .object { color: var(--teal); }
+
+        .convo-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tray);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .convo-close svg {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+        }
+
+        .convo-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+        }
+
+        .convo-scroll::-webkit-scrollbar { display: none; }
+
+        /* Comment Thread */
+        .comment-thread {
+            margin-bottom: 20px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .comment-avatar.verified {
+            background: rgba(77,41,77,0.1);
+            color: var(--eggplant);
+        }
+
+        .comment-body {
+            flex: 1;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .comment-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .comment-badge {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(77,41,77,0.1);
+            color: var(--eggplant);
+            text-transform: uppercase;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .comment-action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        .comment-action:hover {
+            color: var(--text-secondary);
+        }
+
+        .comment-action svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .comment-action.liked {
+            color: var(--gold);
+        }
+
+        /* Reply indent */
+        .comment-reply {
+            margin-left: 52px;
+            padding-left: 16px;
+            border-left: 2px solid var(--border);
+        }
+
+        /* Conversation Input Bar */
+        .convo-input-bar {
+            padding: 12px 20px 30px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .convo-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .convo-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            max-height: 100px;
+            line-height: 1.4;
+        }
+
+        .convo-input:focus {
+            border-color: var(--gold);
+        }
+
+        .convo-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .convo-send {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .convo-send svg {
+            width: 20px;
+            height: 20px;
+            color: #fff;
+        }
+
+        .convo-send:disabled {
+            background: var(--bg-tray);
+        }
+
+        .convo-send:disabled svg {
+            color: var(--text-light);
+        }
+
+        /* Related Content */
+        .related-section { 
+            padding: 0 20px 20px; 
+        }
+
+        /* Related SVO Cards */
+        .related-svo-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .related-svo-card:hover {
+            border-color: var(--teal);
+        }
+
+        .related-svo-thumb {
+            width: 80px;
+            height: 70px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .related-svo-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .related-svo-pills {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .mini-pill {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .mini-pill.subject {
+            background: rgba(204, 94, 51, 0.15);
+            color: var(--orange);
+        }
+
+        .mini-pill.verb {
+            background: var(--bg-tray);
+            color: var(--text-secondary);
+        }
+
+        .mini-pill.object {
+            background: rgba(19, 158, 147, 0.15);
+            color: var(--teal);
+        }
+
+        .mini-arrow {
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        .related-svo-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .related-svo-badge {
+            padding: 6px 10px;
+            background: rgba(19, 158, 147, 0.1);
+            color: var(--teal);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .related-tile {
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .related-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .related-image {
+            height: 80px;
+            width: 100%;
+            position: relative;
+        }
+
+        .content-type-badge {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .content-type-badge.video {
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+        }
+
+        .content-type-badge.article {
+            background: rgba(255,255,255,0.9);
+            color: var(--text-secondary);
+        }
+
+        .related-info {
+            padding: 10px 12px;
+        }
+
+        .related-svo {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.35;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .related-svo .subject {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .related-svo .object {
+            color: var(--teal);
+            font-weight: 600;
+        }
+
+        .related-meta {
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        /* Detail view bottom nav */
+        .detail-nav {
+            flex-shrink: 0;
+        }
+
+        /* ================================ */
+        /* BOTTOM SHEETS */
+        /* ================================ */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 300;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.visible { opacity: 1; visibility: visible; }
+
+        .bottom-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg);
+            border-radius: 24px 24px 0 0;
+            z-index: 310;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 80%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            visibility: hidden;
+        }
+
+        .bottom-sheet.visible { 
+            transform: translateY(0); 
+            visibility: visible;
+        }
+
+        .sheet-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--light-gray);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+
+        .sheet-header {
+            padding: 8px 20px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sheet-title { font-size: 18px; font-weight: 600; }
+
+        .sheet-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .sheet-close svg { width: 18px; height: 18px; color: var(--text-secondary); }
+
+        .sheet-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Save Sheet */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .text-input:focus { border-color: var(--gold); }
+        .text-input::placeholder { color: var(--text-light); }
+
+        .create-btn {
+            padding: 14px 20px;
+            background: var(--choc);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .divider-line { flex: 1; height: 1px; background: var(--border); }
+
+        .divider-text {
+            font-size: 11px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .collection-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .collection-item:hover,
+        .collection-item.selected {
+            border-color: var(--gold);
+            background: rgba(198,145,28,0.05);
+        }
+
+        .collection-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--bg-tray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .collection-info { flex: 1; }
+        .collection-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .collection-count { font-size: 13px; color: var(--text-muted); }
+
+        .collection-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .collection-item.selected .collection-check {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .collection-check svg { width: 14px; height: 14px; color: #fff; opacity: 0; }
+        .collection-item.selected .collection-check svg { opacity: 1; }
+
+        .save-btn-full {
+            width: 100%;
+            padding: 16px;
+            background: var(--gold);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            font-family: inherit;
+        }
+
+        .save-btn-full:disabled {
+            background: var(--bg-tray);
+            color: var(--text-light);
+            cursor: not-allowed;
+        }
+
+        /* Share Sheet */
+        .share-options { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            width: 70px;
+        }
+
+        .share-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--orange);
+            color: #fff;
+        }
+
+        .share-icon.copy { 
+            background: var(--bg-tray); 
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .share-label { font-size: 11px; color: var(--text-muted); }
+
+        .share-link-box {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background: var(--bg-tray);
+            border-radius: 12px;
+        }
+
+        .share-link-input {
+            flex: 1;
+            border: none;
+            background: none;
+            font-size: 13px;
+            color: var(--text-secondary);
+            outline: none;
+        }
+
+        .copy-link-btn {
+            padding: 8px 16px;
+            background: var(--choc);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        /* Sensemaker Profile Sheet */
+        .expert-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .expert-avatar-large {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(77,41,77,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--eggplant);
+        }
+
+        .expert-details { flex: 1; }
+        .expert-name-large { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .expert-role-large { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+
+        .expert-credentials { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .credential-tag {
+            padding: 4px 10px;
+            background: var(--bg-tray);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .expert-stance-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-tray);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stance-label { font-size: 12px; color: var(--text-muted); }
+
+        .stance-value {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: var(--bg);
+        }
+
+        .expert-full-take { margin-bottom: 20px; }
+
+        .take-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .take-full-text {
+            font-size: 17px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .take-full-text::before {
+            content: '"';
+            color: var(--gold);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .take-full-text::after {
+            content: '"';
+            color: var(--gold);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .expert-action-bar {
+            display: flex;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .expert-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .expert-btn svg { width: 18px; height: 18px; }
+        .btn-follow { background: var(--choc); color: #fff; }
+        .btn-save-take { background: var(--gold); color: #fff; }
+
+        /* Toast */
+        .toast {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--choc);
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 400;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="notch"></div>
+
+        <!-- FEED VIEW -->
+        <div class="feed-view" id="feedView">
+            <div class="feed-header">
+                <div class="profile-btn-top" style="position: absolute; top: 44px; right: 20px; background: #e8d4c4; border-radius: 50%; width: 36px; height: 36px;">
+                </div>
+                <div class="logo-row">
+                    <div class="logo-group">
+                        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet">
+                        <svg class="logo-image" width="65" height="35" viewBox="0 0 110 58" fill="none">
+                            <!-- Top row: orange dot, gold dot, teal pill - flush with Trippy width -->
+                            <circle cx="8" cy="9" r="8" fill="#cc5e33"/>
+                            <circle cx="28" cy="9" r="8" fill="#c6911c"/>
+                            <rect x="44" y="1" width="46" height="16" rx="8" fill="#139e93"/>
+                            <!-- Trippy text - tighter to dots -->
+                            <text x="0" y="50" font-family="'Nunito', sans-serif" font-size="32" font-weight="900" fill="#1a1a1a">Trippy</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="feed-tabs">
+                    <div class="feed-tab active">All</div>
+                    <div class="feed-tab">Top</div>
+                    <div class="feed-tab">World</div>
+                    <div class="feed-tab">Nation</div>
+                    <div class="feed-tab">Business</div>
+                </div>
+            </div>
+
+            <div class="feed-scroll">
+                <!-- Back Bar (shown when filtered) -->
+                <div class="filter-back-bar" id="filterBackBar">
+                    <button class="filter-back-btn" onclick="clearAllFilters()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        Back to feed
+                    </button>
+                </div>
+                
+                <!-- Active Filters Display -->
+                <div class="active-filters-bar" id="activeFiltersBar">
+                    <!-- Chips will be inserted here dynamically -->
+                </div>
+                
+                <!-- Filtered Results Section -->
+                <div class="filtered-results" id="filteredResults">
+                    <div class="filtered-results-header">Related Stories</div>
+                    
+                    <!-- Filtered Card 1 -->
+                    <div class="event-card filtered-card" id="filteredCard1">
+                        <div class="card-hero" style="background-image: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600'); background-color: #5a4a3a;" onclick="promoteFilteredCard(1)">
+                            <div class="svo-container">
+                                <div class="svo-row">
+                                    <span class="svo-pill subject clickable" onclick="event.stopPropagation(); toggleFilter('subject', 'Neiman Marcus')">Neiman Marcus</span>
+                                    <span class="svo-arrow">→</span>
+                                    <span class="svo-pill verb">Faces</span>
+                                    <span class="svo-arrow">→</span>
+                                </div>
+                                <div class="svo-row-bottom">
+                                    <span class="svo-pill object clickable" onclick="event.stopPropagation(); toggleFilter('object', 'Vendor Backlash')">Vendor Backlash</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-meta-line">
+                            <span class="meta-item">
+                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
+                                124.2K
+                            </span>
+                            <span class="meta-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                52.1K
+                            </span>
+                            <span class="meta-bookmark">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                            </span>
+                            <span class="meta-date">01/18/26 NYC</span>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Filtered Card 2 -->
+                    <div class="event-card filtered-card" id="filteredCard2">
+                        <div class="card-hero" style="background-image: url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600'); background-color: #3a4a5a;" onclick="promoteFilteredCard(2)">
+                            <div class="svo-container single-line">
+                                <span class="svo-pill subject clickable" onclick="event.stopPropagation(); toggleFilter('subject', 'Luxury Retail')">Luxury Retail</span>
+                                <span class="svo-arrow">→</span>
+                                <span class="svo-pill verb">Enters</span>
+                                <span class="svo-arrow">→</span>
+                                <span class="svo-pill object clickable" onclick="event.stopPropagation(); toggleFilter('object', 'Crisis Mode')">Crisis Mode</span>
+                            </div>
+                        </div>
+                        <div class="card-meta-line">
+                            <span class="meta-item">
+                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
+                                89.5K
+                            </span>
+                            <span class="meta-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                31.8K
+                            </span>
+                            <span class="meta-bookmark">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                            </span>
+                            <span class="meta-date">01/15/26 LA</span>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Filtered Card 3 -->
+                    <div class="event-card filtered-card" id="filteredCard3">
+                        <div class="card-hero" style="background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600'); background-color: #4a3a5a;" onclick="promoteFilteredCard(3)">
+                            <div class="svo-container">
+                                <div class="svo-row">
+                                    <span class="svo-pill subject clickable" onclick="event.stopPropagation(); toggleFilter('subject', 'Department Stores')">Department Stores</span>
+                                    <span class="svo-arrow">→</span>
+                                    <span class="svo-pill verb">Seek</span>
+                                    <span class="svo-arrow">→</span>
+                                </div>
+                                <div class="svo-row-bottom">
+                                    <span class="svo-pill object clickable" onclick="event.stopPropagation(); toggleFilter('object', 'Digital Reinvention')">Digital Reinvention</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-meta-line">
+                            <span class="meta-item">
+                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
+                                156.7K
+                            </span>
+                            <span class="meta-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                67.3K
+                            </span>
+                            <span class="meta-bookmark">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                            </span>
+                            <span class="meta-date">01/12/26 CHI</span>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Save to Stack Button -->
+                    <button class="save-filters-btn" onclick="openSaveSheet()" style="width: 100%; margin-top: 12px; margin-bottom: 16px; padding: 14px;">
+                        Save these stories to a Stack
+                    </button>
+                </div>
+
+                <!-- Card 1: Saks Chapter 11 -->
+                <div class="event-card" id="saksCard">
+                    <div class="card-hero" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600'); background-color: #4c7b87;" onclick="openDetail(0)">
+                        <div class="svo-container single-line">
+                            <span class="svo-pill subject clickable" onclick="event.stopPropagation(); toggleFilter('subject', 'Saks')">Saks</span>
+                            <span class="svo-arrow">→</span>
+                            <span class="svo-pill verb">Files</span>
+                            <span class="svo-arrow">→</span>
+                            <span class="svo-pill object clickable" onclick="event.stopPropagation(); toggleFilter('object', 'Chapter 11')">Chapter 11</span>
+                        </div>
+                    </div>
+                    <div class="card-meta-line">
+                        <span class="meta-item">
+                            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
+                            381.4K
+                        </span>
+                        <span class="meta-item">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            170.5K
+                        </span>
+                        <span class="meta-bookmark">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                        </span>
+                        <span class="meta-date">01/20/26 NYC</span>
+                        
+                    </div>
+                </div>
+
+                <!-- Card 2: Japanese Collection Auction -->
+                <div class="event-card" id="auctionCard">
+                    <div class="card-hero" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600'); background-color: #4c7b87;" onclick="openDetail(1)">
+                        <div class="svo-container">
+                            <div class="svo-row">
+                                <span class="svo-pill subject clickable" onclick="event.stopPropagation(); toggleFilter('subject', 'Japanese Collection')">Japanese Collection</span>
+                                <span class="svo-arrow">→</span>
+                                <span class="svo-pill verb">Brings</span>
+                                <span class="svo-arrow">→</span>
+                            </div>
+                            <div class="svo-row-bottom">
+                                <span class="svo-pill object clickable" onclick="event.stopPropagation(); toggleFilter('object', '60 Million at Auction')">60 Million at Auction</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-meta-line">
+                        <span class="meta-item">
+                            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
+                            381.4K
+                        </span>
+                        <span class="meta-item">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            170.5K
+                        </span>
+                        <span class="meta-bookmark">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                        </span>
+                        <span class="meta-date">01/19/26 NYC</span>
+                        
+                    </div>
+                </div>
+
+                <!-- Card 3: New Drug for Cats -->
+                <div class="event-card" id="catDrugCard">
+                    <div class="card-hero" style="background-image: url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600'); background-color: #4c7b87;" onclick="openDetail(2)">
+                        <div class="svo-container">
+                            <div class="svo-row">
+                                <span class="svo-pill subject clickable" onclick="event.stopPropagation(); toggleFilter('subject', 'New Drug')">New Drug</span>
+                                <span class="svo-arrow">→</span>
+                                <span class="svo-pill verb">Calms</span>
+                                <span class="svo-arrow">→</span>
+                            </div>
+                            <div class="svo-row-bottom">
+                                <span class="svo-pill object clickable" onclick="event.stopPropagation(); toggleFilter('object', 'Cats during transport')">Cats during transport</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-meta-line">
+                        <span class="meta-item">
+                            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
+                            381.4K
+                        </span>
+                        <span class="meta-item">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            170.5K
+                        </span>
+                        <span class="meta-bookmark">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                        </span>
+                        <span class="meta-date">01/02/26 TX</span>
+                        
+                    </div>
+                </div>
+
+                <!-- Start a Trippy Card CTA -->
+                <div class="start-card-cta" onclick="showToast('Starting Trippy Card creator...')">
+                    <span>Start a Trippy Card</span>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </div>
+
+                <!-- Related Media Section (hidden by default) -->
+                <div class="related-media-section" id="relatedMediaSection">
+                    <!-- Context Summary -->
+                    <div class="context-summary">
+                        <p class="context-summary-text" id="contextSummaryText">Fed signals slower pace of rate cuts amid persistent inflation concerns.</p>
+                        <button class="start-trippy-card-btn" onclick="openDetail(2)">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Start Trippy Card
+                        </button>
+                    </div>
+
+                    <div class="related-media-header">
+                        <span class="related-media-title" id="relatedMediaTitle">Related Media</span>
+                        <span class="related-media-count" id="relatedMediaCount">3 items</span>
+                    </div>
+
+                    <!-- Related Media 1 -->
+                    <div class="related-media-card">
+                        <div class="related-media-thumb" style="background: linear-gradient(145deg, #1a3a4a 0%, #2d5a6a 100%);"></div>
+                        <div class="related-media-content">
+                            <div class="related-media-type">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                                Analysis
+                            </div>
+                            <div class="related-media-headline">Fed Officials Debate Pace of Rate Cuts Amid Sticky Inflation</div>
+                            <div class="related-media-source">12 sensemakers · Updated 2h ago</div>
+                        </div>
+                        <div class="related-media-connection">Analysis</div>
+                    </div>
+
+                    <!-- Related Media 2 -->
+                    <div class="related-media-card">
+                        <div class="related-media-thumb" style="background: linear-gradient(145deg, #8b2942 0%, #c44569 100%);"></div>
+                        <div class="related-media-content">
+                            <div class="related-media-type">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                Trend
+                            </div>
+                            <div class="related-media-headline">Powell's 2026 Outlook: Market Expectations vs Reality</div>
+                            <div class="related-media-source">8 sensemakers · Updated 5h ago</div>
+                        </div>
+                        <div class="related-media-connection">Explains</div>
+                    </div>
+
+                    <!-- Related Media 3 -->
+                    <div class="related-media-card">
+                        <div class="related-media-thumb" style="background: linear-gradient(145deg, #2d4a3e 0%, #4a7c5f 100%);"></div>
+                        <div class="related-media-content">
+                            <div class="related-media-type">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Context
+                            </div>
+                            <div class="related-media-headline">Global Central Banks Diverge on 2026 Monetary Policy</div>
+                            <div class="related-media-source">15 sensemakers · Updated 1d ago</div>
+                        </div>
+                        <div class="related-media-connection">Context</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-item active">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </button>
+                <button class="nav-item" onclick="openStacks()">
+                    <div class="nav-stacks-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+                <button class="nav-item" onclick="showToast('Search coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+                <button class="nav-item" onclick="showToast('Alerts coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- STACKS VIEW -->
+        <div class="stacks-view" id="stacksView">
+            <div class="stacks-header">
+                <div class="stacks-title-row">
+                    <h1 class="stacks-title">Stacks</h1>
+                    <span class="stacks-count">4 collections · 73 cards</span>
+                </div>
+            </div>
+
+            <div class="stacks-scroll">
+                <!-- Stack 1 -->
+                <div class="stack-card" onclick="openStackDetail(0)">
+                    <div class="stack-card-header">
+                        <div class="stack-dot" style="background: var(--teal);"></div>
+                        <div class="stack-info">
+                            <div class="stack-name">AI & Machine Learning</div>
+                            <div class="stack-meta">24 cards · 3 updated today</div>
+                        </div>
+                        <div class="stack-arrow">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <div class="stack-preview">
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #3e2d26 0%, #139e93 100%)"></div>
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #4d294d 0%, #4c7b87 100%)"></div>
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #6f7833 0%, #c6911c 100%)"></div>
+                        <div class="stack-preview-more">+21</div>
+                    </div>
+                </div>
+
+                <!-- Stack 2 -->
+                <div class="stack-card" onclick="openStackDetail(1)">
+                    <div class="stack-card-header">
+                        <div class="stack-dot" style="background: var(--choc);"></div>
+                        <div class="stack-info">
+                            <div class="stack-name">Tech Industry</div>
+                            <div class="stack-meta">18 cards · 1 updated today</div>
+                        </div>
+                        <div class="stack-arrow">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <div class="stack-preview">
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #4c7b87 0%, #3e2d26 100%)"></div>
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #ac7169 0%, #494d2a 100%)"></div>
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #c6911c 0%, #4d294d 100%)"></div>
+                        <div class="stack-preview-more">+15</div>
+                    </div>
+                </div>
+
+                <!-- Stack 3 -->
+                <div class="stack-card" onclick="openStackDetail(2)">
+                    <div class="stack-card-header">
+                        <div class="stack-dot" style="background: var(--gold);"></div>
+                        <div class="stack-info">
+                            <div class="stack-name">Markets & Finance</div>
+                            <div class="stack-meta">31 cards · 5 updated today</div>
+                        </div>
+                        <div class="stack-arrow">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <div class="stack-preview">
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #6f7833 0%, #c6911c 100%)"></div>
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #139e93 0%, #3e2d26 100%)"></div>
+                        <div class="stack-preview-thumb" style="background: linear-gradient(145deg, #4d294d 0%, #deb510 100%)"></div>
+                        <div class="stack-preview-more">+28</div>
+                    </div>
+                </div>
+
+                <!-- Stack 4 -->
+                <div class="stack-card" onclick="openStackDetail(3)">
+                    <div class="stack-card-header">
+                        <div class="stack-dot" style="background: var(--orange);"></div>
+                        <div class="stack-info">
+                            <div class="stack-name">Global Policy</div>
+                            <div class="stack-meta">0 cards · New stack</div>
+                        </div>
+                        <div class="stack-arrow">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-item" onclick="closeStacks()">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </button>
+                <button class="nav-item active">
+                    <div class="nav-stacks-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+                <button class="nav-item" onclick="showToast('Search coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+                <button class="nav-item" onclick="showToast('Alerts coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- STACK DETAIL VIEW -->
+        <div class="stack-detail-view" id="stackDetailView">
+            <div class="stack-detail-header">
+                <button class="stack-detail-back" onclick="closeStackDetail()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Stacks
+                </button>
+                <div class="stack-detail-title-row">
+                    <span class="stack-detail-icon" id="stackDetailIcon"></span>
+                    <div>
+                        <div class="stack-detail-title" id="stackDetailTitle">AI & Machine Learning</div>
+                        <div class="stack-detail-count" id="stackDetailCount">24 cards · 3 updated today</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-cards-scroll">
+                <!-- Card with update -->
+                <div class="saved-card-item" onclick="openDetail(0); closeStackDetail(); closeStacks();">
+                    <div class="saved-card-thumb" style="background: linear-gradient(145deg, #3e2d26 0%, #139e93 100%)"></div>
+                    <div class="saved-card-content">
+                        <div class="saved-card-svo">
+                            <span class="subject">Amazon</span> introduces <span class="object">AI Factories</span>
+                        </div>
+                        <div class="saved-card-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Moving Fast</span>
+                            <span class="update-badge">Updated</span>
+                        </div>
+                        <div class="saved-card-meta">
+                            <span>
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                12 new
+                            </span>
+                            <span>2h ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card with update -->
+                <div class="saved-card-item" onclick="openDetail(1); closeStackDetail(); closeStacks();">
+                    <div class="saved-card-thumb" style="background: linear-gradient(145deg, #4d294d 0%, #4c7b87 100%)"></div>
+                    <div class="saved-card-content">
+                        <div class="saved-card-svo">
+                            <span class="subject">EU</span> passes <span class="object">AI Regulation</span>
+                        </div>
+                        <div class="saved-card-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Developing</span>
+                            <span class="update-badge">Updated</span>
+                        </div>
+                        <div class="saved-card-meta">
+                            <span>
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                5 new
+                            </span>
+                            <span>4h ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steady card -->
+                <div class="saved-card-item" onclick="openDetail(2); closeStackDetail(); closeStacks();">
+                    <div class="saved-card-thumb" style="background: linear-gradient(145deg, #6f7833 0%, #c6911c 100%)"></div>
+                    <div class="saved-card-content">
+                        <div class="saved-card-svo">
+                            <span class="subject">Fed</span> signals <span class="object">Rate Cuts in 2026</span>
+                        </div>
+                        <div class="saved-card-status">
+                            <span class="status-dot steady"></span>
+                            <span class="status-text">Steady</span>
+                        </div>
+                        <div class="saved-card-meta">
+                            <span>
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                127
+                            </span>
+                            <span>1d ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More cards -->
+                <div class="saved-card-item">
+                    <div class="saved-card-thumb" style="background: linear-gradient(145deg, #4c7b87 0%, #3e2d26 100%)"></div>
+                    <div class="saved-card-content">
+                        <div class="saved-card-svo">
+                            <span class="subject">Google</span> launches <span class="object">Gemini 2.0</span>
+                        </div>
+                        <div class="saved-card-status">
+                            <span class="status-dot steady"></span>
+                            <span class="status-text">Steady</span>
+                        </div>
+                        <div class="saved-card-meta">
+                            <span>
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                89
+                            </span>
+                            <span>3d ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="saved-card-item">
+                    <div class="saved-card-thumb" style="background: linear-gradient(145deg, #ac7169 0%, #494d2a 100%)"></div>
+                    <div class="saved-card-content">
+                        <div class="saved-card-svo">
+                            <span class="subject">OpenAI</span> releases <span class="object">GPT-5</span>
+                        </div>
+                        <div class="saved-card-status">
+                            <span class="status-dot steady"></span>
+                            <span class="status-text">Confirmed</span>
+                        </div>
+                        <div class="saved-card-meta">
+                            <span>
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                256
+                            </span>
+                            <span>1w ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-item" onclick="closeStackDetail(); closeStacks();">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </button>
+                <button class="nav-item active">
+                    <div class="nav-stacks-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+                <button class="nav-item" onclick="showToast('Search coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+                <button class="nav-item" onclick="showToast('Alerts coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- DETAIL VIEW (Trippy Card) -->
+        <div class="detail-view" id="detailView">
+            <div class="detail-scroll">
+            <!-- Header overlays the image -->
+            <div class="detail-header">
+                <button class="back-btn" onclick="closeDetail()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="header-actions">
+                    <button class="header-action-btn" onclick="showToast('Edit mode coming soon')" title="Edit">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </button>
+                    <button class="header-action-btn" onclick="openSaveSheet()" title="Save">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                    </button>
+                    <button class="header-action-btn" onclick="openShareSheet()" title="Share">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hero image with SVO and tabs -->
+            <div class="detail-hero-wrapper">
+                <div class="detail-hero-image" id="detailHeroImage" style="background: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600') center/cover, #4c7b87"></div>
+                <!-- SVO Pills centered vertically on left -->
+                <div class="detail-hero-svo">
+                    <span class="hero-pill subject">Saks</span>
+                    <span class="hero-arrow">→</span>
+                    <span class="hero-pill verb">Files</span>
+                    <span class="hero-arrow">→</span>
+                    <span class="hero-pill object">Chapter 11</span>
+                </div>
+                <div class="detail-hero-tabs">
+                    <div class="detail-hero-tab active" onclick="switchDetailTab('summary')">Summary</div>
+                    <div class="detail-hero-tab" onclick="switchDetailTab('why')">Why This Matters</div>
+                    <div class="detail-hero-tab" onclick="switchDetailTab('led')">What Led to This</div>
+                    <div class="detail-hero-tab" onclick="switchDetailTab('result')">Result</div>
+                    <div class="detail-hero-tab" onclick="switchDetailTab('sides')">Opposite Sides</div>
+                    <div class="detail-hero-tab" onclick="switchDetailTab('stories')">My Stories</div>
+                    <div class="detail-hero-tab" onclick="switchDetailTab('themes')">Key Themes</div>
+                </div>
+            </div>
+
+            <!-- Content card -->
+            <div class="detail-content-card">
+                <!-- Tab content area -->
+                <div class="detail-tab-content" id="detailTabContent">
+                    <!-- Summary tab (default) -->
+                    <div class="tab-panel active" id="tab-summary">
+                        <div class="tab-time-label">5H Ago · 01/20/26 NYC</div>
+                        <div class="tab-headline"><strong>Saks Global Files for Chapter 11</strong> <span>and secures $1.75 billion, installs former Neiman Marcus Chief.</span></div>
+                        <div class="tab-body">
+                            <p>A creditor-backed financing package gives the retailer runway to reorganize under court oversight.</p>
+                            <p>"This is a defining moment for Saks Global, and the path ahead presents a meaningful opportunity to strengthen the foundation of our business and position it for the future," said van Raemdonck. "In close partnership with these newly appointed leaders and our colleagues across the organization, we will navigate this process together with a continued focus on serving our customers and luxury brands. I look forward to serving as CEO and continuing to transform the Company so that Saks Global continues to play a central role in shaping the <a href="#">future of luxury retail</a>."</p>
+                        </div>
+                    </div>
+
+                    <!-- Why This Matters tab -->
+                    <div class="tab-panel" id="tab-why">
+                        <div class="tab-time-label">Analysis</div>
+                        <div class="tab-headline"><strong>Why This Matters</strong></div>
+                        <div class="tab-body">
+                            <p>The bankruptcy filing signals deeper structural problems in the luxury retail sector. As consumer spending patterns shift and e-commerce continues to disrupt traditional retail, even iconic brands are struggling to adapt.</p>
+                            <p>The $1.75 billion financing package suggests creditors still see value in the Saks brand, but the path to profitability remains unclear amid rising interest rates and changing consumer preferences.</p>
+                        </div>
+                    </div>
+
+                    <!-- What Led to This tab -->
+                    <div class="tab-panel" id="tab-led">
+                        <div class="tab-time-label">Timeline</div>
+                        <div class="tab-headline"><strong>What Led to This</strong></div>
+                        <div class="tab-body">
+                            <p><strong>Late 2024:</strong> Saks acquires Neiman Marcus, taking on significant debt.</p>
+                            <p><strong>Q1 2025:</strong> Management changes payment terms with vendors, straining relationships.</p>
+                            <p><strong>Q3 2025:</strong> Sales decline accelerates as luxury market softens.</p>
+                            <p><strong>January 2026:</strong> Chapter 11 filing with pre-arranged financing.</p>
+                        </div>
+                    </div>
+
+                    <!-- Result tab -->
+                    <div class="tab-panel" id="tab-result">
+                        <div class="tab-time-label">Outcomes</div>
+                        <div class="tab-headline"><strong>Result</strong></div>
+                        <div class="tab-body">
+                            <p><strong>Short-term:</strong> Saks stock suspended, creditors approve financing package. Vendor relationships stabilized with new payment terms.</p>
+                            <p><strong>Long-term:</strong> Could reshape luxury retail landscape. Other department stores watching closely for implications.</p>
+                        </div>
+                    </div>
+
+                    <!-- Opposite Sides tab -->
+                    <div class="tab-panel" id="tab-sides">
+                        <div class="tab-time-label">Perspectives</div>
+                        <div class="tab-headline"><strong>Opposite Sides</strong></div>
+                        <div class="tab-body">
+                            <p><strong style="color: var(--teal);">Bullish View:</strong> "The restructuring gives Saks a clean slate. With reduced debt and new leadership, they can finally compete in the digital age."</p>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">— Retail optimists, restructuring experts</p>
+                            <p><strong style="color: var(--orange);">Bearish View:</strong> "Department stores are dying. No amount of restructuring will save a business model that consumers have abandoned."</p>
+                            <p style="font-size: 12px; color: var(--text-muted);">— Industry skeptics, e-commerce advocates</p>
+                        </div>
+                    </div>
+
+                    <!-- My Stories tab -->
+                    <div class="tab-panel" id="tab-stories">
+                        <div class="tab-time-label">Related</div>
+                        <div class="tab-headline"><strong>My Stories</strong></div>
+                        <div class="tab-body">
+                            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                                <div style="width: 60px; height: 60px; background: var(--teal); border-radius: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--teal); font-weight: 500;">Analysis</div>
+                                    <div style="font-size: 13px; font-weight: 600;">Luxury Retail's Digital Transformation</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">12 sensemakers</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                                <div style="width: 60px; height: 60px; background: var(--gold); border-radius: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gold); font-weight: 500;">Trend</div>
+                                    <div style="font-size: 13px; font-weight: 600;">Department Store Bankruptcies Rise</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">8 sensemakers</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <div style="width: 60px; height: 60px; background: var(--orange); border-radius: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--orange); font-weight: 500;">Context</div>
+                                    <div style="font-size: 13px; font-weight: 600;">Neiman Marcus Acquisition Deep Dive</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">15 sensemakers</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Themes tab -->
+                    <div class="tab-panel" id="tab-themes">
+                        <div class="tab-time-label">Themes</div>
+                        <div class="tab-headline"><strong>Key Themes</strong></div>
+                        <div class="tab-body">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                                <div style="width: 10px; height: 10px; background: var(--gold); border-radius: 50%;"></div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 600;">Debt Restructuring</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Managing $1.75B in new financing</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                                <div style="width: 10px; height: 10px; background: var(--teal); border-radius: 50%;"></div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 600;">Luxury Retail Crisis</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Industry-wide challenges continue</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 10px; height: 10px; background: var(--orange); border-radius: 50%;"></div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 600;">Leadership Change</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Former Neiman Marcus executives take over</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination dots -->
+                    <div class="content-pagination">
+                        <div class="pagination-dot active" onclick="goToPage(1)"></div>
+                        <div class="pagination-dot" onclick="goToPage(2)"></div>
+                        <div class="pagination-dot" onclick="goToPage(3)"></div>
+                    </div>
+                </div>
+
+                <!-- Rest of the card content (scrollable) -->
+                <div class="detail-scroll-rest">
+                    <!-- Sensemaker Takes -->
+                    <div class="section-header">
+                        <span class="section-title">Sensemaker Takes</span>
+                        <span class="section-count">4 perspectives</span>
+                    </div>
+                    <div class="sensemaker-scroll">
+                        <div class="sensemaker-card featured" onclick="openSensemakerSheet(0)">
+                            <div class="featured-badge">Featured Take</div>
+                            <div class="sensemaker-header">
+                                <div class="sensemaker-avatar verified">JB</div>
+                                <div class="sensemaker-info">
+                                    <div class="sensemaker-name">Jacob Bernstein</div>
+                                    <div class="sensemaker-role">Retail Analyst</div>
+                                </div>
+                                <div class="sensemaker-stance stance-cautious">Cautious</div>
+                            </div>
+                            <p class="sensemaker-take">When Saks acquired Neiman Marcus in late 2024, it took on lots of debt. Then, management changed the payment terms...</p>
+                        </div>
+                        <div class="sensemaker-card" onclick="openSensemakerSheet(1)">
+                            <div class="sensemaker-header">
+                                <div class="sensemaker-avatar">ME</div>
+                                <div class="sensemaker-info">
+                                    <div class="sensemaker-name">Mohamed El-Erian</div>
+                                    <div class="sensemaker-role">Economist</div>
+                                </div>
+                                <div class="sensemaker-stance stance-cautious">Cautious</div>
+                            </div>
+                            <p class="sensemaker-take">Markets are pricing in a soft landing, but the data still warrants caution. Watch the labor market...</p>
+                        </div>
+                        <div class="sensemaker-card" onclick="openSensemakerSheet(2)">
+                            <div class="sensemaker-header">
+                                <div class="sensemaker-avatar verified">LS</div>
+                                <div class="sensemaker-info">
+                                    <div class="sensemaker-name">Lauren Sherman</div>
+                                    <div class="sensemaker-role">Fashion Business</div>
+                                </div>
+                                <div class="sensemaker-stance stance-critical">Critical</div>
+                            </div>
+                            <p class="sensemaker-take">This signals deeper structural problems in luxury retail that won't be solved by bankruptcy alone.</p>
+                        </div>
+                    </div>
+
+                    <!-- Conversation -->
+                    <div class="conversation-section" onclick="openConversation()">
+                        <div class="conversation-header">
+                            <span class="section-title">Join the Conversation</span>
+                            <div class="conversation-hint">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                Tap to expand
+                            </div>
+                        </div>
+                        <div class="comment-input-row">
+                            <div class="user-avatar">You</div>
+                            <input type="text" class="comment-input" placeholder="Add your perspective...">
+                        </div>
+                        <span class="comment-count" style="display: block; margin-top: 10px;">127 comments</span>
+                    </div>
+
+                    <!-- Related Media - SVO Card Format -->
+                    <div class="related-section">
+                        <div class="section-header" style="padding-left: 0; padding-right: 0;">
+                            <span class="section-title">Related Media</span>
+                            <span class="section-count">3 items</span>
+                        </div>
+                        
+                        <!-- Related Card 1 -->
+                        <div class="related-svo-card" onclick="showToast('Opening related story...')">
+                            <div class="related-svo-thumb" style="background: linear-gradient(145deg, #1a3a4a 0%, #2d5a6a 100%);"></div>
+                            <div class="related-svo-content">
+                                <div class="related-svo-pills">
+                                    <span class="mini-pill subject">Fed</span>
+                                    <span class="mini-arrow">→</span>
+                                    <span class="mini-pill verb">Debates</span>
+                                    <span class="mini-arrow">→</span>
+                                    <span class="mini-pill object">Pace of Rate Cuts</span>
+                                </div>
+                                <div class="related-svo-meta">12 sensemakers · Updated 2h ago</div>
+                            </div>
+                            <div class="related-svo-badge">Analysis</div>
+                        </div>
+
+                        <!-- Related Card 2 -->
+                        <div class="related-svo-card" onclick="showToast('Opening related story...')">
+                            <div class="related-svo-thumb" style="background: linear-gradient(145deg, #8b2942 0%, #c44569 100%);"></div>
+                            <div class="related-svo-content">
+                                <div class="related-svo-pills">
+                                    <span class="mini-pill subject">Powell's 2026</span>
+                                    <span class="mini-arrow">→</span>
+                                    <span class="mini-pill verb">Anticipates</span>
+                                    <span class="mini-arrow">→</span>
+                                    <span class="mini-pill object">Market</span>
+                                </div>
+                                <div class="related-svo-meta">8 sensemakers · Updated 5h ago</div>
+                            </div>
+                            <div class="related-svo-badge">Explains</div>
+                        </div>
+
+                        <!-- Related Card 3 -->
+                        <div class="related-svo-card" onclick="showToast('Opening related story...')">
+                            <div class="related-svo-thumb" style="background: linear-gradient(145deg, #2d4a3e 0%, #4a7c5f 100%);"></div>
+                            <div class="related-svo-content">
+                                <div class="related-svo-pills">
+                                    <span class="mini-pill subject">Global Banks</span>
+                                    <span class="mini-arrow">→</span>
+                                    <span class="mini-pill verb">Diverge</span>
+                                    <span class="mini-arrow">→</span>
+                                    <span class="mini-pill object">2026</span>
+                                </div>
+                                <div class="related-svo-meta">15 sensemakers · Updated 1d ago</div>
+                            </div>
+                            <div class="related-svo-badge">Context</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav detail-nav">
+                <button class="nav-item active" onclick="closeDetail()">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </button>
+                <button class="nav-item" onclick="openStacks()">
+                    <div class="nav-stacks-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+                <button class="nav-item" onclick="showToast('Search coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+                <button class="nav-item" onclick="showToast('Alerts coming soon')">
+                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </button>
+            </div>
+        </div>
+
+            <div class="conversation-overlay" id="conversationOverlay" onclick="closeConversation()"></div>
+
+            <!-- Conversation Panel (slides up) -->
+            <div class="conversation-panel" id="conversationPanel">
+                <div class="convo-header">
+                    <div class="convo-card-preview">
+                        <div class="convo-card-thumb" id="convoThumb" style="background: linear-gradient(145deg, #3e2d26 0%, #139e93 100%)"></div>
+                        <div class="convo-card-title">
+                            <span class="subject" id="convoSubject">Amazon</span> introduces <span class="object" id="convoObject">AI Factories</span>
+                        </div>
+                    </div>
+                    <button class="convo-close" onclick="closeConversation()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="convo-scroll">
+                    <div class="comment-thread">
+                        <!-- Sensemaker comment -->
+                        <div class="comment-item">
+                            <div class="comment-avatar verified">BE</div>
+                            <div class="comment-body">
+                                <div class="comment-author">
+                                    <span class="comment-name">Benedict Evans</span>
+                                    <span class="comment-badge">Sensemaker</span>
+                                    <span class="comment-time">2h</span>
+                                </div>
+                                <p class="comment-text">This is Amazon doing what Amazon does best — infrastructure at scale. They're not trying to build AGI, they're building the roads.</p>
+                                <div class="comment-actions">
+                                    <button class="comment-action liked">
+                                        <svg fill="currentColor" stroke="none" viewBox="0 0 24 24"><path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                                        248
+                                    </button>
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                        Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reply to sensemaker -->
+                        <div class="comment-item comment-reply">
+                            <div class="comment-avatar">MK</div>
+                            <div class="comment-body">
+                                <div class="comment-author">
+                                    <span class="comment-name">Mike K.</span>
+                                    <span class="comment-time">1h</span>
+                                </div>
+                                <p class="comment-text">Great analogy. AWS built roads for the internet, now they're building roads for AI. History rhymes.</p>
+                                <div class="comment-actions">
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                                        42
+                                    </button>
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                        Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regular comment -->
+                        <div class="comment-item">
+                            <div class="comment-avatar">SL</div>
+                            <div class="comment-body">
+                                <div class="comment-author">
+                                    <span class="comment-name">Sarah L.</span>
+                                    <span class="comment-time">1h</span>
+                                </div>
+                                <p class="comment-text">I'm skeptical. "AI Factory" feels like marketing speak. What's actually different from their existing ML services?</p>
+                                <div class="comment-actions">
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                                        18
+                                    </button>
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                        Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Another sensemaker -->
+                        <div class="comment-item">
+                            <div class="comment-avatar verified">KS</div>
+                            <div class="comment-body">
+                                <div class="comment-author">
+                                    <span class="comment-name">Kara Swisher</span>
+                                    <span class="comment-badge">Sensemaker</span>
+                                    <span class="comment-time">45m</span>
+                                </div>
+                                <p class="comment-text">@Sarah that's exactly my take. The name is doing heavy lifting. But Amazon has earned benefit of the doubt on infrastructure plays.</p>
+                                <div class="comment-actions">
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                                        89
+                                    </button>
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                        Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- More comments -->
+                        <div class="comment-item">
+                            <div class="comment-avatar">JT</div>
+                            <div class="comment-body">
+                                <div class="comment-author">
+                                    <span class="comment-name">James T.</span>
+                                    <span class="comment-time">30m</span>
+                                </div>
+                                <p class="comment-text">As someone who works at an enterprise, the pricing will be key. Azure's been aggressive on AI pricing. Amazon needs to match or beat.</p>
+                                <div class="comment-actions">
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                                        31
+                                    </button>
+                                    <button class="comment-action">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                                        Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="convo-input-bar">
+                    <div class="convo-input-row">
+                        <textarea class="convo-input" placeholder="Add your perspective..." rows="1" id="convoInput" oninput="autoResize(this)"></textarea>
+                        <button class="convo-send" id="convoSend" disabled onclick="sendComment()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
+
+        <!-- Save Sheet -->
+        <div class="bottom-sheet" id="saveSheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <span class="sheet-title">Save to Stack</span>
+                <button class="sheet-close" onclick="closeAllSheets()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="sheet-content">
+                <div class="input-group">
+                    <input type="text" class="text-input" id="newStackInput" placeholder="New stack name...">
+                    <button class="create-btn" onclick="createStack()">Create</button>
+                </div>
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">or choose</span>
+                    <div class="divider-line"></div>
+                </div>
+                <div id="stackList">
+                    <div class="collection-item" onclick="selectStack(this)">
+                        <div class="collection-icon"></div>
+                        <div class="collection-info">
+                            <div class="collection-name">AI & Machine Learning</div>
+                            <div class="collection-count">24 cards</div>
+                        </div>
+                        <div class="collection-check">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                    </div>
+                    <div class="collection-item" onclick="selectStack(this)">
+                        <div class="collection-icon"></div>
+                        <div class="collection-info">
+                            <div class="collection-name">Tech Industry</div>
+                            <div class="collection-count">18 cards</div>
+                        </div>
+                        <div class="collection-check">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                    </div>
+                    <div class="collection-item" onclick="selectStack(this)">
+                        <div class="collection-icon"></div>
+                        <div class="collection-info">
+                            <div class="collection-name">Markets & Finance</div>
+                            <div class="collection-count">31 cards</div>
+                        </div>
+                        <div class="collection-check">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <button class="save-btn-full" id="saveStackBtn" disabled onclick="saveToStack()">Select a stack</button>
+            </div>
+        </div>
+
+        <!-- Share Sheet -->
+        <div class="bottom-sheet" id="shareSheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <span class="sheet-title">Share</span>
+                <button class="sheet-close" onclick="closeAllSheets()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="sheet-content">
+                <div class="share-options">
+                    <div class="share-option" onclick="shareVia('Twitter')">
+                        <div class="share-icon twitter">𝕏</div>
+                        <span class="share-label">Twitter</span>
+                    </div>
+                    <div class="share-option" onclick="shareVia('Facebook')">
+                        <div class="share-icon facebook">f</div>
+                        <span class="share-label">Facebook</span>
+                    </div>
+                    <div class="share-option" onclick="shareVia('LinkedIn')">
+                        <div class="share-icon linkedin">in</div>
+                        <span class="share-label">LinkedIn</span>
+                    </div>
+                    <div class="share-option" onclick="shareVia('WhatsApp')">
+                        <div class="share-icon whatsapp">💬</div>
+                        <span class="share-label">WhatsApp</span>
+                    </div>
+                    <div class="share-option" onclick="shareVia('Email')">
+                        <div class="share-icon email">✉</div>
+                        <span class="share-label">Email</span>
+                    </div>
+                </div>
+                <div class="share-link-box">
+                    <input type="text" class="share-link-input" value="trippy.app/card/amazon-ai-factories" readonly>
+                    <button class="copy-link-btn" onclick="copyLink()">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sensemaker Profile Sheet -->
+        <div class="bottom-sheet" id="sensemakerSheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <span class="sheet-title">Sensemaker</span>
+                <button class="sheet-close" onclick="closeAllSheets()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="sheet-content">
+                <div class="expert-profile">
+                    <div class="expert-avatar-large" id="expertInitials">BE</div>
+                    <div class="expert-details">
+                        <div class="expert-name-large" id="expertName">Benedict Evans</div>
+                        <div class="expert-role-large" id="expertRole">Tech Analyst</div>
+                        <div class="expert-credentials">
+                            <span class="credential-tag">Newsletter Author</span>
+                            <span class="credential-tag">Ex-A16Z</span>
+                            <span class="credential-tag">Verified</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="expert-stance-banner">
+                    <span class="stance-label">Stance on this story</span>
+                    <span class="stance-value" id="expertStance">Bullish</span>
+                </div>
+                <div class="expert-full-take">
+                    <div class="take-label">Full Commentary</div>
+                    <p class="take-full-text" id="expertTake">This is Amazon doing what Amazon does best — infrastructure at scale. They're not trying to build AGI, they're building the roads.</p>
+                </div>
+                <div class="expert-action-bar">
+                    <button class="expert-btn btn-follow" onclick="followExpert()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Follow
+                    </button>
+                    <button class="expert-btn btn-save-take" onclick="saveTake()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                        Save Take
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+        const cardData = [
+            {
+                subject: 'Amazon',
+                verb: ' introduces ',
+                object: 'AI Factories',
+                why: 'Amazon is leading the way in AI technology, signaling a major shift in cloud computing infrastructure.',
+                gradient: 'linear-gradient(145deg, #3e2d26 0%, #139e93 100%)'
+            },
+            {
+                subject: 'EU',
+                verb: ' passes ',
+                object: 'Landmark AI Regulation',
+                why: 'First comprehensive AI law globally. Sets precedent for tech governance worldwide.',
+                gradient: 'linear-gradient(145deg, #4d294d 0%, #4c7b87 100%)'
+            },
+            {
+                subject: 'Fed',
+                verb: ' signals ',
+                object: 'Rate Cuts in 2026',
+                why: 'Markets reacting strongly to dovish Fed language. Housing and tech sectors see immediate movement.',
+                gradient: 'linear-gradient(145deg, #6f7833 0%, #c6911c 100%)'
+            }
+        ];
+
+        const sensemakers = [
+            { initials: 'BE', name: 'Benedict Evans', role: 'Tech Analyst', stance: 'Bullish', take: 'This is Amazon doing what Amazon does best — infrastructure at scale. They\'re not trying to build AGI, they\'re building the roads.' },
+            { initials: 'KS', name: 'Kara Swisher', role: 'Tech Journalist', stance: 'Cautious', take: 'The name \'AI Factory\' is doing a lot of marketing work here. Let\'s see if enterprises actually bite before we declare victory.' },
+            { initials: 'SN', name: 'Satya Nadella', role: 'Microsoft CEO', stance: 'Competitive', take: 'We welcome competition. Our OpenAI partnership gives us a multi-year head start in enterprise AI deployment.' }
+        ];
+
+        let selectedStack = null;
+
+        const stacksData = [
+            { icon: '', name: 'AI & Machine Learning', count: '24 cards · 3 updated today' },
+            { icon: '', name: 'Tech Industry', count: '18 cards · 1 updated today' },
+            { icon: '', name: 'Markets & Finance', count: '31 cards · 5 updated today' },
+            { icon: '', name: 'Global Policy', count: '0 cards · New stack' }
+        ];
+
+        function openStacks() {
+            document.getElementById('stacksView').classList.add('visible');
+        }
+
+        function closeStacks() {
+            document.getElementById('stacksView').classList.remove('visible');
+            document.getElementById('stackDetailView').classList.remove('visible');
+        }
+
+        function openStackDetail(index) {
+            const stack = stacksData[index];
+            document.getElementById('stackDetailIcon').textContent = stack.icon;
+            document.getElementById('stackDetailTitle').textContent = stack.name;
+            document.getElementById('stackDetailCount').textContent = stack.count;
+            document.getElementById('stackDetailView').classList.add('visible');
+        }
+
+        function closeStackDetail() {
+            document.getElementById('stackDetailView').classList.remove('visible');
+        }
+
+        function toggleSummary() {
+            document.getElementById('eventSummaryBlock').classList.toggle('expanded');
+        }
+
+        function openDetail(index) {
+            // Just show the detail view - content is already set in HTML for Saks story
+            document.getElementById('detailView').classList.add('visible');
+        }
+
+        function closeDetail() {
+            document.getElementById('detailView').classList.remove('visible');
+        }
+
+        function openConversation() {
+            const overlay = document.getElementById('conversationOverlay');
+            const panel = document.getElementById('conversationPanel');
+            if (overlay) overlay.classList.add('visible');
+            if (panel) panel.classList.add('visible');
+            const input = document.getElementById('convoInput');
+            if (input) setTimeout(() => input.focus(), 350);
+        }
+
+        function closeConversation() {
+            const overlay = document.getElementById('conversationOverlay');
+            const panel = document.getElementById('conversationPanel');
+            if (overlay) overlay.classList.remove('visible');
+            if (panel) panel.classList.remove('visible');
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+            // Enable/disable send button
+            const sendBtn = document.getElementById('convoSend');
+            sendBtn.disabled = el.value.trim() === '';
+        }
+
+        function sendComment() {
+            const input = document.getElementById('convoInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Add comment to thread (in real app, this would post to server)
+            const thread = document.querySelector('.comment-thread');
+            const comment = document.createElement('div');
+            comment.className = 'comment-item';
+            comment.innerHTML = `
+                <div class="comment-avatar">You</div>
+                <div class="comment-body">
+                    <div class="comment-author">
+                        <span class="comment-name">You</span>
+                        <span class="comment-time">Just now</span>
+                    </div>
+                    <p class="comment-text">${text}</p>
+                    <div class="comment-actions">
+                        <button class="comment-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                            0
+                        </button>
+                        <button class="comment-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                            Reply
+                        </button>
+                    </div>
+                </div>
+            `;
+            thread.insertBefore(comment, thread.firstChild);
+            
+            // Clear input
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('convoSend').disabled = true;
+            
+            showToast('Comment posted!');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.context-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.context-panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('panel-' + tab).classList.add('active');
+        }
+
+        function switchDetailTab(tab) {
+            // Update tab active states
+            document.querySelectorAll('.detail-hero-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update panel visibility
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+        
+        function goToPage(pageNum) {
+            // Update dot active states
+            document.querySelectorAll('.pagination-dot').forEach((dot, index) => {
+                if (index === pageNum - 1) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            showToast('Page ' + pageNum);
+        }
+
+        function openSaveSheet() {
+            document.getElementById('overlay').classList.add('visible');
+            document.getElementById('saveSheet').classList.add('visible');
+        }
+
+        function openShareSheet() {
+            document.getElementById('overlay').classList.add('visible');
+            document.getElementById('shareSheet').classList.add('visible');
+        }
+
+        function openSensemakerSheet(index) {
+            const sm = sensemakers[index];
+            document.getElementById('expertInitials').textContent = sm.initials;
+            document.getElementById('expertName').textContent = sm.name;
+            document.getElementById('expertRole').textContent = sm.role;
+            document.getElementById('expertStance').textContent = sm.stance;
+            document.getElementById('expertTake').textContent = sm.take;
+            document.getElementById('overlay').classList.add('visible');
+            document.getElementById('sensemakerSheet').classList.add('visible');
+        }
+
+        function closeAllSheets() {
+            document.getElementById('overlay').classList.remove('visible');
+            document.getElementById('saveSheet').classList.remove('visible');
+            document.getElementById('shareSheet').classList.remove('visible');
+            document.getElementById('sensemakerSheet').classList.remove('visible');
+        }
+
+        function selectStack(el) {
+            document.querySelectorAll('.collection-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedStack = el.querySelector('.collection-name').textContent;
+            const btn = document.getElementById('saveStackBtn');
+            btn.disabled = false;
+            btn.textContent = 'Save to "' + selectedStack + '"';
+        }
+
+        function createStack() {
+            const input = document.getElementById('newStackInput');
+            const name = input.value.trim();
+            if (!name) return;
+            
+            const list = document.getElementById('stackList');
+            const item = document.createElement('div');
+            item.className = 'collection-item selected';
+            item.onclick = function() { selectStack(this); };
+            item.innerHTML = '<div class="collection-icon">📁</div><div class="collection-info"><div class="collection-name">' + name + '</div><div class="collection-count">0 cards</div></div><div class="collection-check"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>';
+            
+            document.querySelectorAll('.collection-item').forEach(i => i.classList.remove('selected'));
+            list.insertBefore(item, list.firstChild);
+            
+            selectedStack = name;
+            const btn = document.getElementById('saveStackBtn');
+            btn.disabled = false;
+            btn.textContent = 'Save to "' + name + '"';
+            input.value = '';
+        }
+
+        function saveToStack() {
+            if (!selectedStack) return;
+            closeAllSheets();
+            showToast('Saved to "' + selectedStack + '"');
+        }
+
+        function shareVia(platform) {
+            closeAllSheets();
+            showToast('Opening ' + platform + '...');
+        }
+
+        function copyLink() {
+            closeAllSheets();
+            showToast('Link copied!');
+        }
+
+        function followExpert() {
+            const name = document.getElementById('expertName').textContent;
+            closeAllSheets();
+            showToast('Following ' + name);
+        }
+
+        function saveTake() {
+            closeAllSheets();
+            showToast('Take saved to your stack');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 2000);
+        }
+
+        // Tab switching
+        document.querySelectorAll('.feed-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Enter key for stack input
+        document.getElementById('newStackInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') createStack();
+        });
+
+        // Filter State
+        let activeFilters = {
+            subject: null,
+            object: null
+        };
+
+        function toggleFilter(type, value) {
+            // Toggle: if already active, turn off. If not, turn on.
+            if (activeFilters[type] === value) {
+                activeFilters[type] = null;
+            } else {
+                activeFilters[type] = value;
+            }
+            
+            updateFilterUI();
+        }
+        
+        function removeFilter(type) {
+            activeFilters[type] = null;
+            updateFilterUI();
+        }
+
+        function updateFilterUI() {
+            const hasAnyFilter = activeFilters.subject || activeFilters.object;
+            const filterBackBar = document.getElementById('filterBackBar');
+            const activeFiltersBar = document.getElementById('activeFiltersBar');
+            const filteredResults = document.getElementById('filteredResults');
+            const relatedMedia = document.getElementById('relatedMediaSection');
+            
+            // Get all main cards
+            const saksCard = document.getElementById('saksCard');
+            const auctionCard = document.getElementById('auctionCard');
+            const catDrugCard = document.getElementById('catDrugCard');
+            const startCta = document.querySelector('.start-card-cta');
+            
+            // Update all clickable pills' active states
+            document.querySelectorAll('.svo-pill.clickable').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            
+            if (hasAnyFilter) {
+                // Hide the old back bar (we'll use arrow in filter bar instead)
+                filterBackBar.classList.remove('visible');
+                
+                // Build active filters chips - single line with back arrow
+                let chipsHTML = `
+                    <svg class="filter-back-arrow" onclick="clearAllFilters()" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                `;
+                
+                if (activeFilters.subject) {
+                    chipsHTML += `
+                        <div class="active-filter-chip subject">
+                            ${activeFilters.subject}
+                            <svg class="remove-filter" onclick="removeFilter('subject')" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </div>
+                    `;
+                }
+                if (activeFilters.subject && activeFilters.object) {
+                    chipsHTML += '<span class="filter-arrow">→</span>';
+                }
+                if (activeFilters.object) {
+                    chipsHTML += `
+                        <div class="active-filter-chip object">
+                            ${activeFilters.object}
+                            <svg class="remove-filter" onclick="removeFilter('object')" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </div>
+                    `;
+                }
+                
+                activeFiltersBar.innerHTML = chipsHTML;
+                activeFiltersBar.classList.add('visible');
+                
+                // Show filtered results
+                filteredResults.classList.add('visible');
+                
+                // Hide related media (old version)
+                if (relatedMedia) relatedMedia.classList.remove('visible');
+                
+                // Show only the card that matches and hide others
+                if (saksCard) saksCard.style.display = (activeFilters.subject === 'Saks' || activeFilters.object === 'Chapter 11') ? 'block' : 'none';
+                if (auctionCard) auctionCard.style.display = (activeFilters.subject === 'Japanese Collection' || activeFilters.object === '60 Million at Auction') ? 'block' : 'none';
+                if (catDrugCard) catDrugCard.style.display = (activeFilters.subject === 'New Drug' || activeFilters.object === 'Cats during transport') ? 'block' : 'none';
+                if (startCta) startCta.style.display = 'none';
+                
+                // Mark active pills
+                document.querySelectorAll('.svo-pill.clickable').forEach(pill => {
+                    const text = pill.textContent.trim();
+                    if (text === activeFilters.subject || text === activeFilters.object) {
+                        pill.classList.add('active');
+                    }
+                });
+                
+            } else {
+                // No filters - show normal feed
+                filterBackBar.classList.remove('visible');
+                activeFiltersBar.classList.remove('visible');
+                activeFiltersBar.innerHTML = '';
+                filteredResults.classList.remove('visible');
+                if (relatedMedia) relatedMedia.classList.remove('visible');
+                if (saksCard) saksCard.style.display = 'block';
+                if (auctionCard) auctionCard.style.display = 'block';
+                if (catDrugCard) catDrugCard.style.display = 'block';
+                if (startCta) startCta.style.display = 'flex';
+            }
+        }
+
+        function clearAllFilters() {
+            activeFilters.subject = null;
+            activeFilters.object = null;
+            updateFilterUI();
+        }
+        
+        function promoteFilteredCard(cardNum) {
+            // This would promote the clicked filtered card to become the main filter
+            // For demo purposes, show a toast
+            showToast('Card promoted - filters updated');
+        }
+    </script>
+</body>
+</html>
